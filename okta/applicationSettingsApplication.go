@@ -18,10 +18,7 @@
 
 package okta
 
-import ()
-
-type ApplicationSettingsApplication struct {
-}
+type ApplicationSettingsApplication map[string]interface{}
 
 func NewApplicationSettingsApplication() *ApplicationSettingsApplication {
 	return &ApplicationSettingsApplication{}
