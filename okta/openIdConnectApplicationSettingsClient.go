@@ -23,6 +23,7 @@ type OpenIdConnectApplicationSettingsClient struct {
 	ClientUri              string   `json:"client_uri,omitempty"`
 	ConsentMethod          string   `json:"consent_method,omitempty"`
 	GrantTypes             []string `json:"grant_types,omitempty"`
+	InitiateLoginUri       string   `json:"initiate_login_uri,omitempty"`
 	LogoUri                string   `json:"logo_uri,omitempty"`
 	PolicyUri              string   `json:"policy_uri,omitempty"`
 	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris,omitempty"`
