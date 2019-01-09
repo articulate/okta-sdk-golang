@@ -96,7 +96,7 @@ func (re *RequestExecutor) Do(req *http.Request, v interface{}) (*Response, erro
 	inCache := re.cache.Has(cacheKey)
 
 	if !inCache {
-		resp, err := re.doWithRetries(req)
+		resp, err := re.doWithRetries(req, 0)
 
 		if err != nil {
 			return nil, err
