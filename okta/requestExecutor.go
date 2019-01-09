@@ -36,7 +36,12 @@ type RequestExecutor struct {
 	cache      cache.Cache
 }
 
-var Backoff = time.Sleep
+var (
+	Backoff = time.Sleep
+
+	// Limit the size of body we read in when draining the body prior to retry as it will reuse the same connection
+	respReadLimit = int64(4096)
+)
 
 func NewRequestExecutor(httpClient *http.Client, cache cache.Cache, config *Config) *RequestExecutor {
 	re := RequestExecutor{}
@@ -91,7 +96,7 @@ func (re *RequestExecutor) Do(req *http.Request, v interface{}) (*Response, erro
 	inCache := re.cache.Has(cacheKey)
 
 	if !inCache {
-		resp, err := re.doWithRetries(req, 0)
+		resp, err := re.doWithRetries(req)
 
 		if err != nil {
 			return nil, err
@@ -120,20 +125,37 @@ func (re *RequestExecutor) Do(req *http.Request, v interface{}) (*Response, erro
 }
 
 func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*http.Response, error) {
+	// Always rewind the request body when non-nil.
 	resp, err := re.httpClient.Do(req)
 	maxRetries := int(re.config.MaxRetries)
 	bo := re.config.BackoffEnabled
 
 	if (err != nil || (resp.StatusCode == http.StatusTooManyRequests && bo)) && retryCount < maxRetries {
+		if resp != nil {
+			// retrying so we must drain the body
+			tryDrainBody(resp.Body)
+		}
 		// Using an exponential back off method with no jitter for simplicity.
 		if bo {
 			Backoff(time.Duration(1<<uint(retryCount)) * time.Second)
 		}
 		retryCount++
+
+		// Seek body before retrying
+		if req.Body != nil {
+			bodyBytes, _ := ioutil.ReadAll(req.Body)
+			req.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+		}
+
 		resp, err = re.doWithRetries(req, retryCount)
 	}
 
 	return resp, err
+}
+
+func tryDrainBody(body io.ReadCloser) {
+	defer body.Close()
+	io.Copy(ioutil.Discard, io.LimitReader(body, respReadLimit))
 }
 
 type Response struct {
