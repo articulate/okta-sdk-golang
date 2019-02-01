@@ -30,6 +30,7 @@ type OpenIdConnectApplicationSettingsClient struct {
 	RedirectUris           []string `json:"redirect_uris,omitempty"`
 	ResponseTypes          []string `json:"response_types,omitempty"`
 	TosUri                 string   `json:"tos_uri,omitempty"`
+	IssuerMode             string   `json:"issuer_mode,omitempty"`
 }
 
 func NewOpenIdConnectApplicationSettingsClient() *OpenIdConnectApplicationSettingsClient {
