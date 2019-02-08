@@ -13,6 +13,7 @@ type AuthorizationServer struct {
 	Credentials []*AuthServerCredentials `json:"credentials"`
 	Description string                   `json:"descriptions"`
 	Name        string                   `json:"name"`
+	Id          string                   `json:"id"`
 }
 
 type AuthServerCredentials struct {
