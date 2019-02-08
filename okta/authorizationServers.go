@@ -10,7 +10,7 @@ type AuthorizationServerResource resource
 
 type AuthorizationServer struct {
 	Audiences   []string                 `json:"audiences"`
-	Credentials []*AuthServerCredentials `json:"credentials"`
+	Credentials *AuthServerCredentials   `json:"credentials"`
 	Description string                   `json:"descriptions"`
 	Name        string                   `json:"name"`
 	Id          string                   `json:"id"`
