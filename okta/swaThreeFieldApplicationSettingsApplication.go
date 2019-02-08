@@ -26,6 +26,14 @@ type SwaThreeFieldApplicationSettingsApplication struct {
 	ExtraFieldValue    string `json:"extraFieldValue,omitempty"`
 	LoginUrlRegex      string `json:"loginUrlRegex,omitempty"`
 	PasswordSelector   string `json:"passwordSelector,omitempty"`
-	TargetUrl          string `json:"targetUrl,omitempty"`
+	TargetURL          string `json:"targetURL,omitempty"`
 	UserNameSelector   string `json:"userNameSelector,omitempty"`
+}
+
+func NewSwaThreeFieldApplicationSettingsApplication() *SwaThreeFieldApplicationSettingsApplication {
+	return &SwaThreeFieldApplicationSettingsApplication{}
+}
+
+func (a *SwaThreeFieldApplicationSettingsApplication) IsApplicationInstance() bool {
+	return true
 }
