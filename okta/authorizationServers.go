@@ -9,15 +9,15 @@ import (
 type AuthorizationServerResource resource
 
 type AuthorizationServer struct {
-	Audiences   []string                 `json:"audiences"`
-	Credentials *AuthServerCredentials   `json:"credentials"`
-	Description string                   `json:"descriptions"`
-	Name        string                   `json:"name"`
-	Id          string                   `json:"id"`
+	Audiences   []string               `json:"audiences,omitempty"`
+	Credentials *AuthServerCredentials `json:"credentials,omitempty"`
+	Description string                 `json:"descriptions,omitempty"`
+	Name        string                 `json:"name,omitempty"`
+	Id          string                 `json:"id,omitempty"`
 }
 
 type AuthServerCredentials struct {
-	Signing *ApplicationCredentialsSigning `json:"signing"`
+	Signing *ApplicationCredentialsSigning `json:"signing,omitempty"`
 }
 
 func NewAuthorizationServer() *AuthorizationServer {
