@@ -50,8 +50,8 @@ func (m *AuthorizationServerResource) ListAuthorizationServers(id string) ([]Aut
 	}
 	return auth, resp, nil
 }
-func (m *AuthorizationServerResource) AddAuthorizationServer(id string, body AuthorizationServer, qp *query.Params) (interface{}, *Response, error) {
-	url := fmt.Sprintf("/api/v1/authorizationServers/%s", id)
+func (m *AuthorizationServerResource) CreateAuthorizationServer(body AuthorizationServer, qp *query.Params) (*AuthorizationServer, *Response, error) {
+	url := fmt.Sprintf("/api/v1/authorizationServers")
 	if qp != nil {
 		url = url + qp.String()
 	}
@@ -65,10 +65,28 @@ func (m *AuthorizationServerResource) AddAuthorizationServer(id string, body Aut
 	if err != nil {
 		return nil, resp, err
 	}
-	return authorizationServer, resp, nil
+	return &authorizationServer, resp, nil
 }
 
-func (m *AuthorizationServerResource) GetAuthorizationServer(id string, authorizationServerInstance AuthorizationServer) (interface{}, *Response, error) {
+func (m *AuthorizationServerResource) UpdateAuthorizationServer(id string, body AuthorizationServer, qp *query.Params) (*AuthorizationServer, *Response, error) {
+	url := fmt.Sprintf("/api/v1/authorizationServers/%s", id)
+	if qp != nil {
+		url = url + qp.String()
+	}
+	req, err := m.client.requestExecutor.NewRequest("PUT", url, body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	authorizationServer := body
+	resp, err := m.client.requestExecutor.Do(req, &authorizationServer)
+	if err != nil {
+		return nil, resp, err
+	}
+	return &authorizationServer, resp, nil
+}
+
+func (m *AuthorizationServerResource) GetAuthorizationServer(id string, authorizationServerInstance AuthorizationServer) (*AuthorizationServer, *Response, error) {
 	url := fmt.Sprintf("/api/v1/authorizationServers/%s", id)
 	req, err := m.client.requestExecutor.NewRequest("GET", url, nil)
 	if err != nil {
@@ -80,7 +98,7 @@ func (m *AuthorizationServerResource) GetAuthorizationServer(id string, authoriz
 	if err != nil {
 		return nil, resp, err
 	}
-	return authorizationServer, resp, nil
+	return &authorizationServer, resp, nil
 }
 func (m *AuthorizationServerResource) ActivateAuthorizationServer(id string) (*Response, error) {
 	url := fmt.Sprintf("/api/v1/authorizationServers/%s/lifecycle/activate", id)
