@@ -33,12 +33,11 @@ type Client struct {
 
 	resource resource
 
-	Application         *ApplicationResource
-	AuthorizationServer *AuthorizationServerResource
-	Group               *GroupResource
-	Session             *SessionResource
-	User                *UserResource
-	Factor              *FactorResource
+	Application *ApplicationResource
+	Group       *GroupResource
+	Session     *SessionResource
+	User        *UserResource
+	Factor      *FactorResource
 }
 
 type resource struct {
@@ -69,7 +68,6 @@ func NewClient(config *Config, httpClient *http.Client, cacheManager cache.Cache
 	c.resource.client = c
 
 	c.Application = (*ApplicationResource)(&c.resource)
-	c.AuthorizationServer = (*AuthorizationServerResource)(&c.resource)
 	c.Group = (*GroupResource)(&c.resource)
 	c.Session = (*SessionResource)(&c.resource)
 	c.User = (*UserResource)(&c.resource)
