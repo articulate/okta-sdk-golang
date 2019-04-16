@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/okta/okta-sdk-golang/okta/cache"
@@ -129,8 +130,9 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 	resp, err := re.httpClient.Do(req)
 	maxRetries := int(re.config.MaxRetries)
 	bo := re.config.BackoffEnabled
+	wait := re.config.WaitEnabled
 
-	if (err != nil || (resp.StatusCode == http.StatusTooManyRequests && bo)) && retryCount < maxRetries {
+	if (err != nil || (resp.StatusCode == http.StatusTooManyRequests && (bo || wait))) && retryCount < maxRetries {
 		if resp != nil {
 			// retrying so we must drain the body
 			tryDrainBody(resp.Body)
@@ -138,6 +140,12 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 		// Using an exponential back off method with no jitter for simplicity.
 		if bo {
 			Backoff(time.Duration(1<<uint(retryCount)) * time.Second)
+		} else if wait {
+			reset := resp.Header.Get("x-ratelimit-reset")
+			resetNum, _ := strconv.Atoi(reset)
+			t := time.Unix(int64(resetNum), 0)
+			dur := time.Until(t)
+			time.Sleep(dur * time.Millisecond)
 		}
 		retryCount++
 
