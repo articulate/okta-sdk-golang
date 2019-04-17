@@ -51,6 +51,7 @@ func NewRequestExecutor(httpClient *http.Client, cache cache.Cache, config *Conf
 
 	if httpClient == nil {
 		tr := &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
 			IdleConnTimeout: 30 * time.Second,
 		}
 		re.httpClient = &http.Client{Transport: tr}
