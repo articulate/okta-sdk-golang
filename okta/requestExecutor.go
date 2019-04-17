@@ -146,7 +146,7 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 			resetNum, _ := strconv.Atoi(reset)
 			t := time.Unix(int64(resetNum), 0)
 			dur := time.Until(t)
-			time.Sleep(dur * time.Millisecond)
+			time.Sleep(dur)
 		}
 		retryCount++
 
