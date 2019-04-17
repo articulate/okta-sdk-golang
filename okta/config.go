@@ -28,6 +28,7 @@ import (
 type Config struct {
 	BackoffEnabled bool  `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
 	MaxRetries     int32 `yaml:"maxRetries" envconfig:"OKTA_MAX_RETRIES"`
+	WaitEnabled    bool  `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
 	Okta           struct {
 		Client struct {
 			Cache struct {
@@ -133,6 +134,11 @@ func (c *Config) WithToken(token string) *Config {
 
 func (c *Config) WithBackoff(backoff bool) *Config {
 	c.BackoffEnabled = backoff
+	return c
+}
+
+func (c *Config) WithWaitForLimitReset(w bool) *Config {
+	c.WaitEnabled = w
 	return c
 }
 
