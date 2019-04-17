@@ -133,20 +133,23 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 	bo := re.config.BackoffEnabled
 	wait := re.config.WaitEnabled
 
-	if (err != nil || (resp.StatusCode == http.StatusTooManyRequests && (bo || wait))) && retryCount < maxRetries {
+	if (err != nil || isTooMany(resp)) && retryCount < maxRetries {
 		if resp != nil {
 			// retrying so we must drain the body
 			tryDrainBody(resp.Body)
 		}
+
 		// Using an exponential back off method with no jitter for simplicity.
-		if bo {
-			Backoff(time.Duration(1<<uint(retryCount)) * time.Second)
-		} else if wait {
-			reset := resp.Header.Get("x-ratelimit-reset")
-			resetNum, _ := strconv.Atoi(reset)
-			t := time.Unix(int64(resetNum), 0)
-			dur := time.Until(t)
-			time.Sleep(dur)
+		if isTooMany(resp) {
+			if bo {
+				Backoff(time.Duration(1<<uint(retryCount)) * time.Second)
+			} else if wait {
+				reset := resp.Header.Get("X-Rate-Limit-Reset")
+				resetNum, _ := strconv.Atoi(reset)
+				t := time.Unix(int64(resetNum), 0)
+				dur := time.Until(t)
+				time.Sleep(dur)
+			}
 		}
 		retryCount++
 
@@ -160,6 +163,10 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 	}
 
 	return resp, err
+}
+
+func isTooMany(resp *http.Response) bool {
+	return resp.StatusCode == http.StatusTooManyRequests
 }
 
 func tryDrainBody(body io.ReadCloser) {
