@@ -20,15 +20,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/user"
+	"time"
 
 	"github.com/go-yaml/yaml"
 	"github.com/kelseyhightower/envconfig"
 )
 
 type Config struct {
-	BackoffEnabled bool  `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
-	MaxRetries     int32 `yaml:"maxRetries" envconfig:"OKTA_MAX_RETRIES"`
-	WaitEnabled    bool  `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
+	BackoffEnabled bool          `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
+	MaxRetries     int32         `yaml:"maxRetries" envconfig:"OKTA_MAX_RETRIES"`
+	MinWait        time.Duration `yaml:"minWait"`
+	MaxWait        time.Duration `yaml:"maxWait"`
 	Okta           struct {
 		Client struct {
 			Cache struct {
@@ -50,6 +52,11 @@ type Config struct {
 	UserAgentExtra string
 }
 
+var (
+	minBackoff = time.Second * 2
+	maxBackoff = time.Second * 30
+)
+
 func NewConfig() *Config {
 	c := Config{}
 
@@ -57,7 +64,9 @@ func NewConfig() *Config {
 		WithCacheTtl(300).
 		WithCacheTti(300).
 		WithConnectionTimeout(30).
-		WithUserAgentExtra("")
+		WithUserAgentExtra("").
+		WithMinWait(minBackoff).
+		WithMaxWait(maxBackoff)
 
 	c = readConfigFromSystem(c)
 	c = readConfigFromApplication(c)
@@ -137,8 +146,13 @@ func (c *Config) WithBackoff(backoff bool) *Config {
 	return c
 }
 
-func (c *Config) WithWaitForLimitReset(w bool) *Config {
-	c.WaitEnabled = w
+func (c *Config) WithMinWait(wait time.Duration) *Config {
+	c.MinWait = wait
+	return c
+}
+
+func (c *Config) WithMaxWait(wait time.Duration) *Config {
+	c.MaxWait = wait
 	return c
 }
 
