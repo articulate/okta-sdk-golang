@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -38,7 +39,9 @@ type RequestExecutor struct {
 }
 
 var (
-	Backoff = time.Sleep
+	Backoff    = time.Sleep
+	minBackoff = time.Second * 1
+	maxBackoff = time.Second * 30
 
 	// Limit the size of body we read in when draining the body prior to retry as it will reuse the same connection
 	respReadLimit = int64(4096)
@@ -139,10 +142,10 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 			tryDrainBody(resp.Body)
 		}
 
-		// Using an exponential back off method with no jitter for simplicity.
 		if isTooMany(resp) {
+			// Using an exponential back off method with no jitter for simplicity.
 			if bo {
-				Backoff(time.Duration(1<<uint(retryCount)) * time.Second)
+				Backoff(backoffDuration(retryCount))
 			} else if wait {
 				reset := resp.Header.Get("X-Rate-Limit-Reset")
 				resetNum, _ := strconv.Atoi(reset)
@@ -163,6 +166,15 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 	}
 
 	return resp, err
+}
+
+func backoffDuration(attemptNum int) time.Duration {
+	mult := math.Pow(2, float64(attemptNum)) * float64(minBackoff)
+	sleep := time.Duration(mult)
+	if float64(sleep) != mult || sleep > maxBackoff {
+		sleep = maxBackoff
+	}
+	return sleep
 }
 
 func isTooMany(resp *http.Response) bool {
