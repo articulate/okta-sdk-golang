@@ -65,6 +65,7 @@ func NewConfig() *Config {
 		WithCacheTti(300).
 		WithConnectionTimeout(30).
 		WithUserAgentExtra("").
+		WithBackoff(true).
 		WithMinWait(minBackoff).
 		WithMaxWait(maxBackoff)
 
