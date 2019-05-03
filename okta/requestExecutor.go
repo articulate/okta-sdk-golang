@@ -168,7 +168,7 @@ func backoffDuration(attemptNum int, min, max time.Duration) time.Duration {
 }
 
 func isTooMany(resp *http.Response) bool {
-	return resp.StatusCode == http.StatusTooManyRequests
+	return resp != nil && resp.StatusCode == http.StatusTooManyRequests
 }
 
 func tryDrainBody(body io.ReadCloser) {
