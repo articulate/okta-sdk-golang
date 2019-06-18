@@ -28,6 +28,7 @@ import (
 
 type Config struct {
 	BackoffEnabled bool          `yaml:"withBackoff" envconfig:"OKTA_BACK_OFF_ENABLED"`
+	WaitEnabled    bool          `yaml:"withWait" envconfig:"OKTA_WAIT_ENABLED"`
 	MaxRetries     int32         `yaml:"maxRetries" envconfig:"OKTA_MAX_RETRIES"`
 	MinWait        time.Duration `yaml:"minWait"`
 	MaxWait        time.Duration `yaml:"maxWait"`
