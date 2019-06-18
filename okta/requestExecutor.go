@@ -98,7 +98,7 @@ func (re *RequestExecutor) Do(req *http.Request, v interface{}) (*Response, erro
 	inCache := re.cache.Has(cacheKey)
 
 	if !inCache {
-		resp, err := re.doWithRetries(req, 0)
+		resp, err := re.DoWithRetries(req, 0)
 
 		if err != nil {
 			return nil, err
@@ -126,7 +126,8 @@ func (re *RequestExecutor) Do(req *http.Request, v interface{}) (*Response, erro
 
 }
 
-func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*http.Response, error) {
+// DoWithRetries performs a request with configured retries and backup strategy. Exposed publicly for non JSON endpoints.
+func (re *RequestExecutor) DoWithRetries(req *http.Request, retryCount int) (*http.Response, error) {
 	// Always rewind the request body when non-nil.
 	resp, err := re.httpClient.Do(req)
 	maxRetries := int(re.config.MaxRetries)
@@ -152,7 +153,7 @@ func (re *RequestExecutor) doWithRetries(req *http.Request, retryCount int) (*ht
 			req.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
-		resp, err = re.doWithRetries(req, retryCount)
+		resp, err = re.DoWithRetries(req, retryCount)
 	}
 
 	return resp, err
