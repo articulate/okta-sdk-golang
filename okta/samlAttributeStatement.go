@@ -18,13 +18,13 @@
 
 package okta
 
-import ()
-
 type SamlAttributeStatement struct {
-	Name      string   `json:"name,omitempty"`
-	Namespace string   `json:"namespace,omitempty"`
-	Type      string   `json:"type,omitempty"`
-	Values    []string `json:"values,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Namespace   string   `json:"namespace,omitempty"`
+	Type        string   `json:"type,omitempty"`
+	Values      []string `json:"values,omitempty"`
+	FilterType  string   `json:"filterType,omitempty"`
+	FilterValue string   `json:"filterValue,omitempty"`
 }
 
 func NewSamlAttributeStatement() *SamlAttributeStatement {
