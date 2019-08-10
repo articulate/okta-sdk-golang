@@ -18,12 +18,12 @@
 
 package okta
 
-import ()
-
 type AutoLoginApplicationSettings struct {
-	App           *ApplicationSettingsApplication     `json:"app,omitempty"`
-	Notifications *ApplicationSettingsNotifications   `json:"notifications,omitempty"`
-	SignOn        *AutoLoginApplicationSettingsSignOn `json:"signOn,omitempty"`
+	App                *ApplicationSettingsApplication     `json:"app,omitempty"`
+	ImplicitAssignment *bool                               `json:"implicitAssignment,omitempty"`
+	InlineHookId       string                              `json:"inlineHookId,omitempty"`
+	Notifications      *ApplicationSettingsNotifications   `json:"notifications,omitempty"`
+	SignOn             *AutoLoginApplicationSettingsSignOn `json:"signOn,omitempty"`
 }
 
 func NewAutoLoginApplicationSettings() *AutoLoginApplicationSettings {

@@ -30,7 +30,7 @@ import (
 )
 
 func Test_can_get_a_user(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create user with credentials → POST /api/v1/users?activate=false
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -63,11 +63,11 @@ func Test_can_get_a_user(t *testing.T) {
 	assert.Equal(t, user.Id, ubln.Id, "Could not find user by Login")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -76,7 +76,7 @@ func Test_can_get_a_user(t *testing.T) {
 }
 
 func Test_can_activate_a_user(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	//Create user with credentials → POST /api/v1/users?activate=false
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -117,16 +117,16 @@ func Test_can_activate_a_user(t *testing.T) {
 	assert.True(t, found, "The user was not found")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 }
 
 func Test_can_update_user_profile(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create user with credentials → POST /api/v1/users?activate=false
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -154,7 +154,7 @@ func Test_can_update_user_profile(t *testing.T) {
 	updatedUser := &okta.User{
 		Profile: &newProfile,
 	}
-	_, _, err = client.User.UpdateUser(user.Id, *updatedUser)
+	_, _, err = client.User.UpdateUser(user.Id, *updatedUser, nil)
 	require.NoError(t, err, "Could not update the user")
 
 	// Verify that user profile is updated by calling get on the user → GET /api/v1/users/{{userId}}
@@ -163,16 +163,16 @@ func Test_can_update_user_profile(t *testing.T) {
 	tmpProfile := *tmpUser.Profile
 	assert.Equal(t, "Batman", tmpProfile["nickName"])
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 }
 
 func Test_can_suspend_a_user(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	//Create user with credentials → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -226,16 +226,16 @@ func Test_can_suspend_a_user(t *testing.T) {
 	}
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 }
 
 func Test_can_change_users_password(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create user with credentials → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -271,7 +271,7 @@ func Test_can_change_users_password(t *testing.T) {
 		OldPassword: op,
 		NewPassword: np,
 	}
-	_, _, err = client.User.ChangePassword(user.Id, *npr)
+	_, _, err = client.User.ChangePassword(user.Id, *npr, nil)
 	require.NoError(t, err, "Could not change password")
 
 	// Get the user and verify that 'passwordChanged' field has increased → GET /api/v1/users/{{userId}}/
@@ -281,11 +281,11 @@ func Test_can_change_users_password(t *testing.T) {
 	assert.True(t, ubid.PasswordChanged.After(*user.PasswordChanged), "Appears that password change did not happen")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -294,7 +294,7 @@ func Test_can_change_users_password(t *testing.T) {
 }
 
 func Test_can_get_reset_password_link_for_user(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create user with credentials → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -325,11 +325,11 @@ func Test_can_get_reset_password_link_for_user(t *testing.T) {
 	assert.NotEmpty(t, rpt.ResetPasswordUrl, "Reset Password is not set")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -338,7 +338,7 @@ func Test_can_get_reset_password_link_for_user(t *testing.T) {
 }
 
 func Test_can_expire_a_users_password_and_get_a_temp_one(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create a user with credentials, activated by default → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -369,11 +369,11 @@ func Test_can_expire_a_users_password_and_get_a_temp_one(t *testing.T) {
 	assert.NotEmpty(t, ep.TempPassword, "Temp Password not provided")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -382,7 +382,7 @@ func Test_can_expire_a_users_password_and_get_a_temp_one(t *testing.T) {
 }
 
 func Test_can_change_user_recovery_question(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create a user with credentials, activated by default → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -441,11 +441,11 @@ func Test_can_change_user_recovery_question(t *testing.T) {
 	assert.True(t, ubid.PasswordChanged.After(*user.PasswordChanged), "Appears that password change did not happen")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -454,7 +454,7 @@ func Test_can_change_user_recovery_question(t *testing.T) {
 }
 
 func Test_can_assign_a_user_to_a_role(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create a user with credentials, activated by default → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -480,7 +480,7 @@ func Test_can_assign_a_user_to_a_role(t *testing.T) {
 	r := &okta.Role{
 		Type: "USER_ADMIN",
 	}
-	_, _, err = client.User.AddRoleToUser(user.Id, *r)
+	r, _, err = client.User.AddRoleToUser(user.Id, *r)
 	require.NoError(t, err, "Should not have had an error when adding role to user")
 
 	// List roles for the user and verify added role → GET /api/v1/users/{{userId}}/roles
@@ -512,11 +512,11 @@ func Test_can_assign_a_user_to_a_role(t *testing.T) {
 	assert.False(t, found, "Could not verify USER_ADMIN was removed to the user")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}
@@ -526,7 +526,7 @@ func Test_can_assign_a_user_to_a_role(t *testing.T) {
 }
 
 func Test_user_group_target_role(t *testing.T) {
-	client := tests.NewClient()
+	client, _ := tests.NewClient()
 	// Create a user with credentials, activated by default → POST /api/v1/users?activate=true
 	p := &okta.PasswordCredential{
 		Value: "Abcd1234",
@@ -592,11 +592,11 @@ func Test_user_group_target_role(t *testing.T) {
 	require.NoError(t, err, "Should not have had an error when removing group target to role")
 
 	// Deactivate the user → POST /api/v1/users/{{userId}}/lifecycle/deactivate
-	_, err = client.User.DeactivateUser(user.Id)
+	_, err = client.User.DeactivateUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deactivating")
 
 	// Delete the user → DELETE /api/v1/users/{{userId}}
-	_, err = client.User.DeactivateOrDeleteUser(user.Id)
+	_, err = client.User.DeactivateOrDeleteUser(user.Id, nil)
 	require.NoError(t, err, "Should not error when deleting")
 
 	// Verify that the user is deleted by calling get on user (Exception thrown with 404 error message) → GET /api/v1/users/{{userId}}

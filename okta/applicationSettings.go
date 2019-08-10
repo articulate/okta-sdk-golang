@@ -21,8 +21,10 @@ package okta
 import ()
 
 type ApplicationSettings struct {
-	App           *ApplicationSettingsApplication   `json:"app,omitempty"`
-	Notifications *ApplicationSettingsNotifications `json:"notifications,omitempty"`
+	App                *ApplicationSettingsApplication   `json:"app,omitempty"`
+	ImplicitAssignment *bool                             `json:"implicitAssignment,omitempty"`
+	InlineHookId       string                            `json:"inlineHookId,omitempty"`
+	Notifications      *ApplicationSettingsNotifications `json:"notifications,omitempty"`
 }
 
 func NewApplicationSettings() *ApplicationSettings {
