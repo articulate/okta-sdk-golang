@@ -20,8 +20,9 @@ package okta
 
 import (
 	"fmt"
-	"github.com/okta/okta-sdk-golang/okta/query"
 	"time"
+
+	"github.com/okta/okta-sdk-golang/okta/query"
 )
 
 type UserResource resource
@@ -73,8 +74,11 @@ func (m *UserResource) GetUser(userId string) (*User, *Response, error) {
 	}
 	return user, resp, nil
 }
-func (m *UserResource) UpdateUser(userId string, body User) (*User, *Response, error) {
+func (m *UserResource) UpdateUser(userId string, body User, qp *query.Params) (*User, *Response, error) {
 	url := fmt.Sprintf("/api/v1/users/%v", userId)
+	if qp != nil {
+		url = url + qp.String()
+	}
 	req, err := m.client.requestExecutor.NewRequest("PUT", url, body)
 	if err != nil {
 		return nil, nil, err
@@ -87,8 +91,11 @@ func (m *UserResource) UpdateUser(userId string, body User) (*User, *Response, e
 	}
 	return user, resp, nil
 }
-func (m *UserResource) DeactivateOrDeleteUser(userId string) (*Response, error) {
+func (m *UserResource) DeactivateOrDeleteUser(userId string, qp *query.Params) (*Response, error) {
 	url := fmt.Sprintf("/api/v1/users/%v", userId)
+	if qp != nil {
+		url = url + qp.String()
+	}
 	req, err := m.client.requestExecutor.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return nil, err
@@ -134,8 +141,11 @@ func (m *UserResource) ListAppLinks(userId string, qp *query.Params) ([]*AppLink
 	}
 	return appLink, resp, nil
 }
-func (m *UserResource) ChangePassword(userId string, body ChangePasswordRequest) (*UserCredentials, *Response, error) {
+func (m *UserResource) ChangePassword(userId string, body ChangePasswordRequest, qp *query.Params) (*UserCredentials, *Response, error) {
 	url := fmt.Sprintf("/api/v1/users/%v/credentials/change_password", userId)
+	if qp != nil {
+		url = url + qp.String()
+	}
 	req, err := m.client.requestExecutor.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, nil, err
@@ -213,25 +223,11 @@ func (m *UserResource) ActivateUser(userId string, qp *query.Params) (*UserActiv
 	}
 	return userActivationToken, resp, nil
 }
-func (m *UserResource) ReactivateUser(userId string, qp *query.Params) (*UserActivationToken, *Response, error) {
-	url := fmt.Sprintf("/api/v1/users/%v/lifecycle/reactivate", userId)
+func (m *UserResource) DeactivateUser(userId string, qp *query.Params) (*Response, error) {
+	url := fmt.Sprintf("/api/v1/users/%v/lifecycle/deactivate", userId)
 	if qp != nil {
 		url = url + qp.String()
 	}
-	req, err := m.client.requestExecutor.NewRequest("POST", url, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
- 	var userActivationToken *UserActivationToken
-	resp, err := m.client.requestExecutor.Do(req, &userActivationToken)
-	if err != nil {
-		return nil, resp, err
-	}
-	return userActivationToken, resp, nil
-}
-func (m *UserResource) DeactivateUser(userId string) (*Response, error) {
-	url := fmt.Sprintf("/api/v1/users/%v/lifecycle/deactivate", userId)
 	req, err := m.client.requestExecutor.NewRequest("POST", url, nil)
 	if err != nil {
 		return nil, err

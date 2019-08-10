@@ -18,8 +18,6 @@
 
 package okta
 
-import ()
-
 type UserCredentials struct {
 	Emails           []*UserEmail                `json:"emails,omitempty"`
 	Password         *PasswordCredential         `json:"password,omitempty"`
